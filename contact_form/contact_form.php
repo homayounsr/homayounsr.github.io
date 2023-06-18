@@ -1,7 +1,7 @@
 <?php
 
 // configure
-$from = 'hs@github.io'; // Replace it with Your Hosting Admin email. REQUIRED!
+$from = 'homayounsr@github.io'; // Replace it with Your Hosting Admin email. REQUIRED!
 $sendTo = 'homayoun.srp@gmail.com'; // Replace it with Your email. REQUIRED!
 $subject = 'New message from your website form';
 $fields = array('name' => 'Name', 'email' => 'Email', 'subject' => 'Subject', 'message' => 'Message'); // array variable name => Text to appear in the email. If you added or deleted a field in the contact form, edit this array.
