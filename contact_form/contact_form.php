@@ -1,80 +1,33 @@
 <?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get the form fields and sanitize input
+    $name = htmlspecialchars($_POST["name"]);
+    $email = htmlspecialchars($_POST["email"]);
+    $subject = htmlspecialchars($_POST["subject"]);
+    $message = htmlspecialchars($_POST["message"]);
 
-// configure
-$from = 'homayounsr@github.io'; // Replace it with Your Hosting Admin email. REQUIRED!
-$sendTo = 'homayoun.srp@gmail.com'; // Replace it with Your email. REQUIRED!
-$subject = 'New message from your website form';
-$fields = array('name' => 'Name', 'email' => 'Email', 'subject' => 'Subject', 'message' => 'Message'); // array variable name => Text to appear in the email. If you added or deleted a field in the contact form, edit this array.
-$okMessage = 'Your message successfully submitted. Thank you, I will get back to you soon!';
-$errorMessage = 'There was an error while submitting the form. Please try again later';
+    // Set the recipient email address
+    $recipient = "homayoun.srp@gmail.com"; // Replace with your email address
 
-// let's do the sending
+    // Set the email subject
+    $emailSubject = "New Contact Form Submission: $subject";
 
-if(isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])):
-    //your site secret key
-    $secret = '6LdqmCAUAAAAANONcPUkgVpTSGGqm60cabVMVaON';
-    //get verify response data
+    // Build the email content
+    $emailContent = "Name: $name\n";
+    $emailContent .= "Email: $email\n\n";
+    $emailContent .= "Message:\n$message";
 
-    $c = curl_init('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$_POST['g-recaptcha-response']);
-    curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-    $verifyResponse = curl_exec($c);
+    // Set the email headers
+    $headers = "From: $name <$email>\r\n";
+    $headers .= "Reply-To: $email\r\n";
 
-    $responseData = json_decode($verifyResponse);
-    if($responseData->success):
-
-        try
-        {
-            $emailText = nl2br("You have new message from Contact Form\n");
-
-            foreach ($_POST as $key => $value) {
-
-                if (isset($fields[$key])) {
-                    $emailText .= nl2br("$fields[$key]: $value\n");
-                }
-            }
-
-            $headers = array('Content-Type: text/html; charset="UTF-8";',
-                'From: ' . $from,
-                'Reply-To: ' . $from,
-                'Return-Path: ' . $from,
-            );
-            
-            mail($sendTo, $subject, $emailText, implode("\n", $headers));
-
-            $responseArray = array('type' => 'success', 'message' => $okMessage);
-        }
-        catch (\Exception $e)
-        {
-            $responseArray = array('type' => 'danger', 'message' => $errorMessage);
-        }
-
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            $encoded = json_encode($responseArray);
-
-            header('Content-Type: application/json');
-
-            echo $encoded;
-        }
-        else {
-            echo $responseArray['message'];
-        }
-
-    else:
-        $errorMessage = 'Robot verification failed, please try again.';
-        $responseArray = array('type' => 'danger', 'message' => $errorMessage);
-        $encoded = json_encode($responseArray);
-
-            header('Content-Type: application/json');
-
-            echo $encoded;
-    endif;
-else:
-    $errorMessage = 'Please click on the reCAPTCHA box.';
-    $responseArray = array('type' => 'danger', 'message' => $errorMessage);
-    $encoded = json_encode($responseArray);
-
-            header('Content-Type: application/json');
-
-            echo $encoded;
-endif;
-
+    // Send the email
+    if (mail($recipient, $emailSubject, $emailContent, $headers)) {
+        echo "Thank you for contacting us! Your message has been sent.";
+    } else {
+        echo "There was a problem sending your message. Please try again.";
+    }
+} else {
+    echo "Invalid request.";
+}
+?>
